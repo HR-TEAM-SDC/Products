@@ -20,7 +20,7 @@ app.get('/products', (req, res) => {
 
 app.get('/products/:product_id', (req, res) => {
   const { product_id } = req.params;
-  let queryString = `SELECT p.*, json_agg(DISTINCT jsonb_build_object('feature', f.feature, 'value', f.value)) AS features FROM product p LEFT JOIN features f ON f.product_id = p.id WHERE p.id = ${product_id} GROUP BY p.id`;
+  let queryString = `SELECT p.*, json_agg(DISTINCT jsonb_build_object('value', f.value, 'feature', f.feature)) AS features FROM product p LEFT JOIN features f ON f.product_id = p.id WHERE p.id = ${product_id} GROUP BY p.id`;
   pool.query(queryString)
     .then(result => {
       res.header('Content-Type', 'application/json');
@@ -38,12 +38,13 @@ app.get('/products/:product_id/styles', (req, res) => {
     product_id: product_id,
     results: []
   };
-  let queryString = `SELECT s.id AS style_id, s.name, s.original_price, s.sale_price, s.default_style AS default, json_agg(DISTINCT jsonb_build_object('thumbnail_url', p.thumbnail_url, 'url', p.url)) as photos, json_agg(DISTINCT jsonb_build_object('quantity', sk.quantity, 'size', sk.size)) as skus
+  let queryString = `SELECT s.id AS style_id, s.name, s.original_price, s.sale_price, s.default_style AS default, json_agg(DISTINCT jsonb_build_object('url', p.url, 'thumbnail_url', p.thumbnail_url)) as photos, json_object_agg(COALESCE(sk.id, 0), jsonb_build_object('size', sk.size, 'quantity', sk.quantity)) as skus
   FROM styles as s
   LEFT JOIN photos as p ON p.styleId = s.id
   LEFT JOIN skus as sk ON sk.styleId = s.id
   WHERE s.productId = ${product_id}
   GROUP BY s.id`;
+
   pool.query(queryString)
     .then(data => {
       result.results = data.rows;
