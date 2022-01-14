@@ -16,7 +16,7 @@ CREATE TABLE product (
 );
 
 COPY product(id, name, slogan, description, category, default_price)
-FROM '/Users/thha3203/Documents/SDC_Data/productTest.csv'
+FROM '/Users/thha3203/Documents/SDC_Data/product.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -24,12 +24,11 @@ CREATE TABLE related (
   id SERIAL PRIMARY KEY,
   current_product_id INT NOT NULL,
   related_product_id INT NOT NULL,
-  FOREIGN KEY (current_product_id) REFERENCES product (id),
-  FOREIGN KEY (related_product_id) REFERENCES product (id)
+  FOREIGN KEY (current_product_id) REFERENCES product (id)
 );
 
 COPY related(id, current_product_id, related_product_id)
-FROM '/Users/thha3203/Documents/SDC_Data/relatedTest.csv'
+FROM '/Users/thha3203/Documents/SDC_Data/related.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -42,7 +41,7 @@ CREATE TABLE features (
 );
 
 COPY features(id, product_id, feature, value)
-FROM '/Users/thha3203/Documents/SDC_Data/featuresTest.csv'
+FROM '/Users/thha3203/Documents/SDC_Data/features.csv'
 DELIMITER ','
 NULL AS 'null'
 CSV HEADER;
@@ -58,7 +57,7 @@ CREATE TABLE styles (
 );
 
 COPY styles(id, productId, name, sale_price, original_price, default_style)
-FROM '/Users/thha3203/Documents/SDC_Data/stylesTest.csv'
+FROM '/Users/thha3203/Documents/SDC_Data/styles.csv'
 DELIMITER ','
 NULL AS 'null'
 CSV HEADER;
@@ -76,7 +75,7 @@ CREATE TABLE photos (
 );
 
 COPY photos(id, styleId, url, thumbnail_url)
-FROM '/Users/thha3203/Documents/SDC_Data/photosTest.csv'
+FROM '/Users/thha3203/Documents/SDC_Data/photos.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -89,7 +88,7 @@ CREATE TABLE skus (
 );
 
 COPY skus(id, styleId, size, quantity)
-FROM '/Users/thha3203/Documents/SDC_Data/skusTest.csv'
+FROM '/Users/thha3203/Documents/SDC_Data/skus.csv'
 DELIMITER ','
 CSV HEADER;
 
