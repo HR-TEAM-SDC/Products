@@ -12,7 +12,7 @@ CREATE TABLE product (
   slogan TEXT NULL,
   description TEXT NULL,
   category VARCHAR(255) NOT NULL,
-  default_price INT NOT NULL
+  default_price VARCHAR(255) NOT NULL
 );
 
 COPY product(id, name, slogan, description, category, default_price)
@@ -51,9 +51,9 @@ CREATE TABLE styles (
   id SERIAL PRIMARY KEY,
   productId INT NOT NULL,
   name VARCHAR(500) NOT NULL,
-  sale_price INT NULL DEFAULT 0,
-  original_price INT NULL DEFAULT 0,
-  default_style SMALLINT DEFAULT 0,
+  sale_price VARCHAR(255) NULL,
+  original_price VARCHAR(255) NOT NULL,
+  default_style SMALLINT,
   FOREIGN KEY (productId) REFERENCES product (id)
 );
 
@@ -62,6 +62,10 @@ FROM '/Users/thha3203/Documents/SDC_Data/stylesTest.csv'
 DELIMITER ','
 NULL AS 'null'
 CSV HEADER;
+
+ALTER TABLE styles ALTER COLUMN default_style DROP DEFAULT;
+ALTER TABLE styles ALTER default_style TYPE bool USING CASE WHEN default_style=0 THEN FALSE ELSE TRUE END;
+ALTER TABLE styles ALTER COLUMN default_style SET DEFAULT FALSE;
 
 CREATE TABLE photos (
   id SERIAL PRIMARY KEY,
@@ -88,3 +92,12 @@ COPY skus(id, styleId, size, quantity)
 FROM '/Users/thha3203/Documents/SDC_Data/skusTest.csv'
 DELIMITER ','
 CSV HEADER;
+
+
+CREATE INDEX product_id_index ON product (id);
+CREATE INDEX related_productId_index ON related (current_product_id);
+CREATE INDEX features_productId_index ON features (product_id);
+CREATE INDEX styles_id_index ON styles (id);
+CREATE INDEX styles_productId_index ON styles (productId);
+CREATE INDEX photos_styleId_index ON photos (styleId);
+CREATE INDEX skus_styleId_index ON skus (styleId);
