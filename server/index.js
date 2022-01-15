@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get('/loaderio-e9f580e8a80c6e044a1cd39a98edd43f' (req, res) => {
+app.get('/loaderio-e9f580e8a80c6e044a1cd39a98edd43f', (req, res) => {
   res.send('loaderio-e9f580e8a80c6e044a1cd39a98edd43f');
 });
 
@@ -44,7 +44,7 @@ app.get('/products/:product_id/styles', (req, res) => {
   };
   let queryString = `SELECT s.id AS style_id, s.name, s.original_price, s.sale_price, s.default_style AS default,
   json_agg(DISTINCT jsonb_build_object('url', p.url, 'thumbnail_url', p.thumbnail_url)) as photos,
-  json_object_agg(COALESCE(sk.id, 0), jsonb_build_object('size', sk.size, 'quantity', sk.quantity)) as skus
+  json_object_agg(COALESCE(sk.id::VARCHAR, 'null'), jsonb_build_object('size', sk.size, 'quantity', sk.quantity)) as skus
   FROM styles as s
   LEFT JOIN photos as p ON p.styleId = s.id
   LEFT JOIN skus as sk ON sk.styleId = s.id
