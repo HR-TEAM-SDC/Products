@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  host: 'localhost',
+const pool1 = new Pool({
+  host: '54.67.112.18',
   port: 5432,
   user: 'postgres',
   password: 'password',
@@ -11,8 +11,8 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000
 });
 
-const poolR = new Pool({
-  host: '54.67.112.18',
+const pool2 = new Pool({
+  host: '54.193.71.67',
   port: 5432,
   user: 'postgres',
   password: 'password',
@@ -33,6 +33,6 @@ const poolR = new Pool({
 // });
 
 module.exports = {
-  poolLocal: pool,
-  poolRemote: poolR
+  pool1: pool1,
+  pool2: pool2
 };

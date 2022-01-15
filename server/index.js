@@ -1,5 +1,5 @@
 const express = require('express');
-const { poolLocal, poolRemote } = require('../db/connect.js');
+const { pool1, pool2 } = require('../db/connect.js');
 
 const app = express();
 
@@ -7,15 +7,15 @@ var counter = 0;
 
 app.use(express.json());
 
-app.get('/loaderio-e9f580e8a80c6e044a1cd39a98edd43f', (req, res) => {
-  res.send('loaderio-e9f580e8a80c6e044a1cd39a98edd43f');
+app.get('/loaderio-68cd13bd18c2957cb1b33c561d2cad34', (req, res) => {
+  res.send('loaderio-68cd13bd18c2957cb1b33c561d2cad34');
 });
 
 app.get('/products', (req, res) => {
   let page = req.query.page || 1;
   let count = req.query.count || 5;
   if (counter % 2 === 0) {
-    poolRemote.query(`SELECT * FROM product LIMIT ${count}`)
+    pool1.query(`SELECT * FROM product LIMIT ${count}`)
       .then(result => {
         res.json(result.rows);
       })
@@ -25,7 +25,7 @@ app.get('/products', (req, res) => {
       });
     counter++;
   } else {
-    poolLocal.query(`SELECT * FROM product LIMIT ${count}`)
+    pool2.query(`SELECT * FROM product LIMIT ${count}`)
     .then(result => {
       res.json(result.rows);
     })
@@ -41,7 +41,7 @@ app.get('/products/:product_id', (req, res) => {
   const { product_id } = req.params;
   let queryString = `SELECT p.*, json_agg(DISTINCT jsonb_build_object('value', f.value, 'feature', f.feature)) AS features FROM product p LEFT JOIN features f ON f.product_id = p.id WHERE p.id = ${product_id} GROUP BY p.id`;
   if (counter % 2 === 0) {
-    poolRemote.query(queryString)
+    pool1.query(queryString)
       .then(result => {
         res.header('Content-Type', 'application/json');
         res.send(result.rows[0]);
@@ -52,7 +52,7 @@ app.get('/products/:product_id', (req, res) => {
       });
     counter++;
   } else {
-    poolLocal.query(queryString)
+    pool2.query(queryString)
       .then(result => {
         res.header('Content-Type', 'application/json');
         res.send(result.rows[0]);
@@ -80,7 +80,7 @@ app.get('/products/:product_id/styles', (req, res) => {
   WHERE s.productId = ${product_id}
   GROUP BY s.id`;
   if (counter % 2 === 0) {
-    poolRemote.query(queryString)
+    pool1.query(queryString)
       .then(data => {
         result.results = data.rows;
         res.header('Content-Type', 'application/json');
@@ -92,7 +92,7 @@ app.get('/products/:product_id/styles', (req, res) => {
       });
     counter++;
   } else {
-    poolLocal.query(queryString)
+    pool2.query(queryString)
       .then(data => {
         result.results = data.rows;
         res.header('Content-Type', 'application/json');
@@ -110,7 +110,7 @@ app.get('/products/:product_id/related', (req, res) => {
   const { product_id } = req.params;
   let queryString = `SELECT ARRAY (SELECT related_product_id FROM related WHERE related.current_product_id = ${product_id})`;
   if (counter % 2 === 0) {
-    poolRemote.query(queryString)
+    pool1.query(queryString)
       .then(data => {
         res.header('Content-Type', 'application/json');
         res.send(data.rows[0]['array']);
@@ -121,7 +121,7 @@ app.get('/products/:product_id/related', (req, res) => {
       });
     counter++;
   } else {
-    poolLocal.query(queryString)
+    pool2.query(queryString)
       .then(data => {
         res.header('Content-Type', 'application/json');
         res.send(data.rows[0]['array']);
