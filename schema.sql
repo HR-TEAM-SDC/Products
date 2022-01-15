@@ -2,69 +2,69 @@
 
 -- DROP DATABASE IF EXISTS products;
 
-CREATE DATABASE products;
+-- CREATE DATABASE products;
 
 \c products;
 
-CREATE TABLE product (
+-- CREATE TABLE product (
+--   id SERIAL PRIMARY KEY,
+--   name VARCHAR(500) NOT NULL,
+--   slogan TEXT NULL,
+--   description TEXT NULL,
+--   category VARCHAR(255) NOT NULL,
+--   default_price VARCHAR(255) NOT NULL
+-- );
+
+-- COPY product(id, name, slogan, description, category, default_price)
+-- FROM '/home/ubuntu/data/product.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+CREATE TABLE related (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(500) NOT NULL,
-  slogan TEXT NULL,
-  description TEXT NULL,
-  category VARCHAR(255) NOT NULL,
-  default_price VARCHAR(255) NOT NULL
+  current_product_id INT NOT NULL,
+  related_product_id INT NOT NULL,
+  FOREIGN KEY (current_product_id) REFERENCES product (id)
 );
 
-COPY product(id, name, slogan, description, category, default_price)
-FROM '/home/ubuntu/data/product.csv'
+COPY related(id, current_product_id, related_product_id)
+FROM '/home/ubuntu/data/related.csv'
 DELIMITER ','
 CSV HEADER;
 
--- CREATE TABLE related (
---   id SERIAL PRIMARY KEY,
---   current_product_id INT NOT NULL,
---   related_product_id INT NOT NULL,
---   FOREIGN KEY (current_product_id) REFERENCES product (id)
--- );
+CREATE TABLE features (
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL,
+  feature VARCHAR(100) NOT NULL,
+  value VARCHAR(255) NULL,
+  FOREIGN KEY (product_id) REFERENCES product (id)
+);
 
--- COPY related(id, current_product_id, related_product_id)
--- FROM '/home/ubuntu/data/related.csv'
--- DELIMITER ','
--- CSV HEADER;
+COPY features(id, product_id, feature, value)
+FROM '/home/ubuntu/data/features.csv'
+DELIMITER ','
+NULL AS 'null'
+CSV HEADER;
 
--- CREATE TABLE features (
---   id SERIAL PRIMARY KEY,
---   product_id INT NOT NULL,
---   feature VARCHAR(100) NOT NULL,
---   value VARCHAR(255) NULL,
---   FOREIGN KEY (product_id) REFERENCES product (id)
--- );
+CREATE TABLE styles (
+  id SERIAL PRIMARY KEY,
+  productId INT NOT NULL,
+  name VARCHAR(500) NOT NULL,
+  sale_price VARCHAR(255) NULL,
+  original_price VARCHAR(255) NOT NULL,
+  default_style SMALLINT,
+  FOREIGN KEY (productId) REFERENCES product (id)
+);
 
--- COPY features(id, product_id, feature, value)
--- FROM '/home/ubuntu/data/features.csv'
--- DELIMITER ','
--- NULL AS 'null'
--- CSV HEADER;
+COPY styles(id, productId, name, sale_price, original_price, default_style)
+FROM '/home/ubuntu/data/styles.csv'
+DELIMITER ','
+NULL AS 'null'
+CSV HEADER;
 
--- CREATE TABLE styles (
---   id SERIAL PRIMARY KEY,
---   productId INT NOT NULL,
---   name VARCHAR(500) NOT NULL,
---   sale_price VARCHAR(255) NULL,
---   original_price VARCHAR(255) NOT NULL,
---   default_style SMALLINT,
---   FOREIGN KEY (productId) REFERENCES product (id)
--- );
-
--- COPY styles(id, productId, name, sale_price, original_price, default_style)
--- FROM '/home/ubuntu/data/styles.csv'
--- DELIMITER ','
--- NULL AS 'null'
--- CSV HEADER;
-
--- ALTER TABLE styles ALTER COLUMN default_style DROP DEFAULT;
--- ALTER TABLE styles ALTER default_style TYPE bool USING CASE WHEN default_style=0 THEN FALSE ELSE TRUE END;
--- ALTER TABLE styles ALTER COLUMN default_style SET DEFAULT FALSE;
+ALTER TABLE styles ALTER COLUMN default_style DROP DEFAULT;
+ALTER TABLE styles ALTER default_style TYPE bool USING CASE WHEN default_style=0 THEN FALSE ELSE TRUE END;
+ALTER TABLE styles ALTER COLUMN default_style SET DEFAULT FALSE;
 
 -- CREATE TABLE photos (
 --   id SERIAL PRIMARY KEY,
