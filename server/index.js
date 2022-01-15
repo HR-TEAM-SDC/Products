@@ -1,7 +1,9 @@
 const express = require('express');
-const pool = require('../db/connect.js');
+const { poolLocal, poolRemote } = require('../db/connect.js');
 
 const app = express();
+
+var counter = 0;
 
 app.use(express.json());
 
@@ -12,7 +14,18 @@ app.get('/loaderio-e9f580e8a80c6e044a1cd39a98edd43f', (req, res) => {
 app.get('/products', (req, res) => {
   let page = req.query.page || 1;
   let count = req.query.count || 5;
-  pool.query(`SELECT * FROM product LIMIT ${count}`)
+  if (counter % 2 === 0) {
+    poolRemote.query(`SELECT * FROM product LIMIT ${count}`)
+      .then(result => {
+        res.json(result.rows);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  } else {
+    poolLocal.query(`SELECT * FROM product LIMIT ${count}`)
     .then(result => {
       res.json(result.rows);
     })
@@ -20,20 +33,36 @@ app.get('/products', (req, res) => {
       console.log(err);
       res.send(err.message);
     });
+    counter++;
+  };
 });
 
 app.get('/products/:product_id', (req, res) => {
   const { product_id } = req.params;
   let queryString = `SELECT p.*, json_agg(DISTINCT jsonb_build_object('value', f.value, 'feature', f.feature)) AS features FROM product p LEFT JOIN features f ON f.product_id = p.id WHERE p.id = ${product_id} GROUP BY p.id`;
-  pool.query(queryString)
-    .then(result => {
-      res.header('Content-Type', 'application/json');
-      res.send(JSON.stringify(result.rows[0], null, 2));
-    })
-    .catch(err => {
-      console.log(err);
-      res.send(err.message);
-    });
+  if (counter % 2 === 0) {
+    poolRemote.query(queryString)
+      .then(result => {
+        res.header('Content-Type', 'application/json');
+        res.send(result.rows[0]);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  } else {
+    poolLocal.query(queryString)
+      .then(result => {
+        res.header('Content-Type', 'application/json');
+        res.send(result.rows[0]);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  };
 });
 
 app.get('/products/:product_id/styles', (req, res) => {
@@ -50,31 +79,63 @@ app.get('/products/:product_id/styles', (req, res) => {
   LEFT JOIN skus as sk ON sk.styleId = s.id
   WHERE s.productId = ${product_id}
   GROUP BY s.id`;
-
-  pool.query(queryString)
-    .then(data => {
-      result.results = data.rows;
-      res.header('Content-Type', 'application/json');
-      res.send(JSON.stringify(result, null, 2));
-    })
-    .catch(err => {
-      console.log(err);
-      res.send(err.message);
-    });
+  if (counter % 2 === 0) {
+    poolRemote.query(queryString)
+      .then(data => {
+        result.results = data.rows;
+        res.header('Content-Type', 'application/json');
+        res.send(result);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  } else {
+    poolLocal.query(queryString)
+      .then(data => {
+        result.results = data.rows;
+        res.header('Content-Type', 'application/json');
+        res.send(result);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  };
 });
 
 app.get('/products/:product_id/related', (req, res) => {
   const { product_id } = req.params;
   let queryString = `SELECT ARRAY (SELECT related_product_id FROM related WHERE related.current_product_id = ${product_id})`;
-  pool.query(queryString)
-    .then(data => {
-      res.header('Content-Type', 'application/json');
-      res.send(data.rows[0]['array']);
-    })
-    .catch(err => {
-      console.log(err);
-      res.send(err.message);
-    });
+  if (counter % 2 === 0) {
+    poolRemote.query(queryString)
+      .then(data => {
+        res.header('Content-Type', 'application/json');
+        res.send(data.rows[0]['array']);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  } else {
+    poolLocal.query(queryString)
+      .then(data => {
+        res.header('Content-Type', 'application/json');
+        res.send(data.rows[0]['array']);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(err.message);
+      });
+    counter++;
+  };
+});
+
+app.get('/counter', (req, res) => {
+  res.send(JSON.stringify(counter));
 });
 
 const port = 3000;

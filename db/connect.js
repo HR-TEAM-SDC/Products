@@ -6,7 +6,18 @@ const pool = new Pool({
   user: 'postgres',
   password: 'password',
   database: 'products',
-  max: 20,
+  max: 50,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
+});
+
+const poolR = new Pool({
+  host: '54.67.112.18',
+  port: 5432,
+  user: 'postgres',
+  password: 'password',
+  database: 'products',
+  max: 50,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000
 });
@@ -16,9 +27,12 @@ const pool = new Pool({
 //   port: 5432,
 //   user: 'thha3203',
 //   database: 'products',
-//   max: 20,
+//   max: 50,
 //   idleTimeoutMillis: 30000,
 //   connectionTimeoutMillis: 2000
 // });
 
-module.exports = pool;
+module.exports = {
+  poolLocal: pool,
+  poolRemote: poolR
+};
