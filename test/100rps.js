@@ -5,11 +5,11 @@ import { Counter } from 'k6/metrics';
 export const requests = new Counter('http_reqs');
 
 export const options = {
-  vus: 100,
+  vus: 120,
   duration: '15s'
 };
-
-const url = 'http://localhost:3000/products/1';
+node -
+const url = 'http://localhost:3000/products/1/styles';
 
 export default function() {
   const res = http.get(url);
