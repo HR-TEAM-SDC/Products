@@ -16,7 +16,7 @@ CREATE TABLE product (
 );
 
 COPY product(id, name, slogan, description, category, default_price)
-FROM '/Users/thha3203/Documents/SDC_Data/product.csv'
+FROM '/home/ubuntu/data/product.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -28,7 +28,7 @@ CREATE TABLE related (
 );
 
 COPY related(id, current_product_id, related_product_id)
-FROM '/Users/thha3203/Documents/SDC_Data/related.csv'
+FROM '/home/ubuntu/data/related.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -41,7 +41,7 @@ CREATE TABLE features (
 );
 
 COPY features(id, product_id, feature, value)
-FROM '/Users/thha3203/Documents/SDC_Data/features.csv'
+FROM '/home/ubuntu/data/features.csv'
 DELIMITER ','
 NULL AS 'null'
 CSV HEADER;
@@ -57,7 +57,7 @@ CREATE TABLE styles (
 );
 
 COPY styles(id, productId, name, sale_price, original_price, default_style)
-FROM '/Users/thha3203/Documents/SDC_Data/styles.csv'
+FROM '/home/ubuntu/data/styles.csv'
 DELIMITER ','
 NULL AS 'null'
 CSV HEADER;
@@ -75,7 +75,7 @@ CREATE TABLE photos (
 );
 
 COPY photos(id, styleId, url, thumbnail_url)
-FROM '/Users/thha3203/Documents/SDC_Data/photos.csv'
+FROM '/home/ubuntu/data/photos.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -88,7 +88,7 @@ CREATE TABLE skus (
 );
 
 COPY skus(id, styleId, size, quantity)
-FROM '/Users/thha3203/Documents/SDC_Data/skus.csv'
+FROM '/home/ubuntu/data/skus.csv'
 DELIMITER ','
 CSV HEADER;
 
