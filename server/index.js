@@ -1,5 +1,5 @@
 const express = require('express');
-const { pool1, pool2 } = require('../db/connect.js');
+const { pool, client } = require('../db/connect.js');
 
 const app = express();
 
@@ -14,8 +14,34 @@ app.get('/loaderio-68cd13bd18c2957cb1b33c561d2cad34', (req, res) => {
 app.get('/products', (req, res) => {
   let page = req.query.page || 1;
   let count = req.query.count || 5;
-  if (counter % 2 === 0) {
-    pool1.query(`SELECT * FROM product LIMIT ${count}`)
+
+  // client.get('products')
+  //   .then(data => {
+  //     if (data !== null) {
+  //       console.log('cache hit');
+  //       res.json(JSON.parse(data));
+  //     } else {
+  //       pool.query(`SELECT * FROM product LIMIT ${count}`)
+  //         .then(queryData => {
+  //           console.log('cache miss');
+  //           let stringData = JSON.stringify(queryData.rows);
+  //           client.set('products', stringData);
+  //           res.send(queryData.rows);
+  //         })
+  //         .catch(e => {
+  //           res.send('QUERY ERROR');
+  //         })
+  //     };
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     res.send(err.message);
+  //   });
+
+
+
+//  if (counter % 2 === 0) {
+    pool.query(`SELECT * FROM product LIMIT ${count}`)
       .then(result => {
         res.json(result.rows);
       })
@@ -23,7 +49,7 @@ app.get('/products', (req, res) => {
         console.log(err);
         res.send(err.message);
       });
-    counter++;
+/*    counter++;
   } else {
     pool2.query(`SELECT * FROM product LIMIT ${count}`)
     .then(result => {
@@ -34,14 +60,14 @@ app.get('/products', (req, res) => {
       res.send(err.message);
     });
     counter++;
-  };
+  };*/
 });
 
 app.get('/products/:product_id', (req, res) => {
   const { product_id } = req.params;
-  let queryString = `SELECT p.*, json_agg(DISTINCT jsonb_build_object('value', f.value, 'feature', f.feature)) AS features FROM product p LEFT JOIN features f ON f.product_id = p.id WHERE p.id = ${product_id} GROUP BY p.id`;
-  if (counter % 2 === 0) {
-    pool1.query(queryString)
+  let queryString = `SELECT p.*, json_agg(jsonb_build_object('value', f.value, 'feature', f.feature)) AS features FROM product p LEFT JOIN features f ON f.product_id = p.id WHERE p.id = ${product_id} GROUP BY p.id`;
+//  if (counter % 2 === 0) {
+    pool.query(queryString)
       .then(result => {
         res.header('Content-Type', 'application/json');
         res.send(result.rows[0]);
@@ -50,7 +76,7 @@ app.get('/products/:product_id', (req, res) => {
         console.log(err);
         res.send(err.message);
       });
-    counter++;
+/*    counter++;
   } else {
     pool2.query(queryString)
       .then(result => {
@@ -62,7 +88,7 @@ app.get('/products/:product_id', (req, res) => {
         res.send(err.message);
       });
     counter++;
-  };
+  };*/
 });
 
 app.get('/products/:product_id/styles', (req, res) => {
@@ -79,18 +105,40 @@ app.get('/products/:product_id/styles', (req, res) => {
   LEFT JOIN skus as sk ON sk.styleId = s.id
   WHERE s.productId = ${product_id}
   GROUP BY s.id`;
-  if (counter % 2 === 0) {
-    pool1.query(queryString)
-      .then(data => {
-        result.results = data.rows;
-        res.header('Content-Type', 'application/json');
-        res.send(result);
-      })
-      .catch(err => {
-        console.log(err);
-        res.send(err.message);
-      });
-    counter++;
+//  if (counter % 2 === 0) {
+  // client.get(`product:${product_id}`)
+  //   .then(data => {
+  //     if (data !== null) {
+  //       console.log('cache hit');
+  //       res.header('Content-Type', 'application/json');
+  //       res.send(JSON.parse(data));
+  //     } else {
+  //       pool.query(queryString)
+  //         .then(data => {
+  //           console.log('cache miss');
+  //           result.results = data.rows;
+  //           let stringData = JSON.stringify(result);
+  //           client.set(`product:${product_id}`, stringData);
+  //           res.header('Content-Type', 'application/json');
+  //           res.send(result);
+  //         })
+  //         .catch(err => {
+  //           console.log(err);
+  //           res.send(err.message);
+  //         });
+  //     }
+  //   })
+  pool.query(queryString)
+  .then(data => {
+    result.results = data.rows;
+    res.header('Content-Type', 'application/json');
+    res.send(result);
+  })
+  .catch(err => {
+    console.log(err);
+    res.send(err.message);
+  });
+/*    counter++;
   } else {
     pool2.query(queryString)
       .then(data => {
@@ -103,14 +151,14 @@ app.get('/products/:product_id/styles', (req, res) => {
         res.send(err.message);
       });
     counter++;
-  };
+  };*/
 });
 
 app.get('/products/:product_id/related', (req, res) => {
   const { product_id } = req.params;
   let queryString = `SELECT ARRAY (SELECT related_product_id FROM related WHERE related.current_product_id = ${product_id})`;
-  if (counter % 2 === 0) {
-    pool1.query(queryString)
+//  if (counter % 2 === 0) {
+    pool.query(queryString)
       .then(data => {
         res.header('Content-Type', 'application/json');
         res.send(data.rows[0]['array']);
@@ -119,7 +167,7 @@ app.get('/products/:product_id/related', (req, res) => {
         console.log(err);
         res.send(err.message);
       });
-    counter++;
+/*    counter++;
   } else {
     pool2.query(queryString)
       .then(data => {
@@ -131,7 +179,7 @@ app.get('/products/:product_id/related', (req, res) => {
         res.send(err.message);
       });
     counter++;
-  };
+  };*/
 });
 
 app.get('/counter', (req, res) => {
