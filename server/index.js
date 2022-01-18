@@ -76,13 +76,11 @@ app.get('/products/:product_id/styles', (req, res) => {
   client.get(`product:${product_id}`)
     .then(data => {
       if (data !== null) {
-        console.log('cache hit');
         res.header('Content-Type', 'application/json');
         res.send(JSON.parse(data));
       } else {
         pool.query(queryString)
           .then(data => {
-            console.log('cache miss');
             result.results = data.rows;
             let stringData = JSON.stringify(result);
             client.set(`product:${product_id}`, stringData);
