@@ -1,14 +1,14 @@
 const { Pool } = require('pg');
-const { createClient } = require('redis');
+// const { createClient } = require('redis');
 
-const client = createClient({
-  url: 'redis://@18.144.171.187:6379'
-});
+// const client = createClient({
+//   url: 'redis://@18.144.171.187:6379'
+// });
 
-client.connect();
+// client.connect();
 
-client.on('connect', () => console.log('Redis connected'));
-client.on('error', (error) => console.log('Redis Error', error));
+// client.on('connect', () => console.log('Redis connected'));
+// client.on('error', (error) => console.log('Redis Error', error));
 
 // const pool1 = new Pool({
 //   host: '54.67.112.18',
@@ -43,6 +43,5 @@ const pool2 = new Pool({
 // });
 
 module.exports = {
-  client: client,
   pool: pool2
 };

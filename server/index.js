@@ -1,5 +1,5 @@
 const express = require('express');
-const { pool, client } = require('../db/connect.js');
+const { pool } = require('../db/connect.js');
 
 const app = express();
 
@@ -73,36 +73,36 @@ app.get('/products/:product_id/styles', (req, res) => {
   LEFT JOIN skus as sk ON sk.styleId = s.id
   WHERE s.productId = ${product_id}
   GROUP BY s.id`;
-  client.get(`product:${product_id}`)
-    .then(data => {
-      if (data !== null) {
-        res.header('Content-Type', 'application/json');
-        res.send(JSON.parse(data));
-      } else {
-        pool.query(queryString)
-          .then(data => {
-            result.results = data.rows;
-            let stringData = JSON.stringify(result);
-            client.set(`product:${product_id}`, stringData);
-            res.header('Content-Type', 'application/json');
-            res.send(result);
-          })
-          .catch(err => {
-            console.log(err);
-            res.send(err.message);
-          });
-      }
-    })
-  // pool.query(queryString)
-  // .then(data => {
-  //   result.results = data.rows;
-  //   res.header('Content-Type', 'application/json');
-  //   res.send(result);
-  // })
-  // .catch(err => {
-  //   console.log(err);
-  //   res.send(err.message);
-  // });
+  // client.get(`product:${product_id}`)
+  //   .then(data => {
+  //     if (data !== null) {
+  //       res.header('Content-Type', 'application/json');
+  //       res.send(JSON.parse(data));
+  //     } else {
+  //       pool.query(queryString)
+  //         .then(data => {
+  //           result.results = data.rows;
+  //           let stringData = JSON.stringify(result);
+  //           client.set(`product:${product_id}`, stringData);
+  //           res.header('Content-Type', 'application/json');
+  //           res.send(result);
+  //         })
+  //         .catch(err => {
+  //           console.log(err);
+  //           res.send(err.message);
+  //         });
+  //     }
+  //   })
+  pool.query(queryString)
+  .then(data => {
+    result.results = data.rows;
+    res.header('Content-Type', 'application/json');
+    res.send(result);
+  })
+  .catch(err => {
+    console.log(err);
+    res.send(err.message);
+  });
 });
 
 app.get('/products/:product_id/related', (req, res) => {
